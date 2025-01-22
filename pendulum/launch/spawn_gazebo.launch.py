@@ -7,6 +7,7 @@ from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node  
 import os  
 from ament_index_python import get_package_share_directory
+from launch.launch_description_sources import PythonLaunchDescriptionSource
 
 def generate_launch_description():  
     return LaunchDescription([  
@@ -22,7 +23,7 @@ def generate_launch_description():
         DeclareLaunchArgument('y', default_value='0.0', description='Y position of the robot'),  
         DeclareLaunchArgument('z', default_value='0.0', description='Z position of the robot'),  
         DeclareLaunchArgument('robot_name', default_value='pendulum', description='Name of the robot'),  
-        DeclareLaunchArgument('robot_file', default_value=os.path.join(get_package_share_directory('pendulum'), 'urdf', 'cartpole.urdf'), description='Path to the robot URDF file'),  
+        DeclareLaunchArgument('robot_file', default_value=get_package_share_directory('pendulum')+'urdf'+'cartpole.urdf', description='Path to the robot URDF file'),  
 
         # Load robot description parameter  
         Node(  
@@ -36,21 +37,21 @@ def generate_launch_description():
 
         # Launch Gazebo with own world configuration  
         IncludeLaunchDescription(  
-            get_package_share_directory('pendulum') + '/launch/empty_world.launch.py',  
-            launch_arguments={  
-                'world_name': 'worlds/empty.world',  
-                'debug': LaunchConfiguration('debug'),  
-                'gui': LaunchConfiguration('gui'),  
-                'paused': LaunchConfiguration('paused'),  
-                'use_sim_time': LaunchConfiguration('use_sim_time'),  
-                'headless': LaunchConfiguration('headless'),  
-            }.items()  
+            PythonLaunchDescriptionSource([get_package_share_directory('gazebo_ros'), '/launch/gazebo.launch.py']),  
+            launch_arguments=[  
+                ('world', os.path.join(get_package_share_directory('fishbot_description'), 'worlds', 'fishbot.world')),  
+                ('debug', LaunchConfiguration('debug')),  
+                ('gui', LaunchConfiguration('gui')),  
+                ('paused', LaunchConfiguration('paused')),  
+                ('use_sim_time', LaunchConfiguration('use_sim_time')),  
+                ('headless', LaunchConfiguration('headless')),  
+            ]  
         ),  
 
         # Spawn the ROBOT  
         Node(  
             package='gazebo_ros',  
-            executable='spawn_model',  
+            executable='spawn_entity.py',  
             name='urdf_spawner',  
             output='screen',  
             arguments=[  
