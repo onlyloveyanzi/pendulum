@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.22)  
-project(pendulum_control)  
+project(pendulum)  
 
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")

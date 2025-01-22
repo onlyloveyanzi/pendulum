@@ -1,8 +1,12 @@
+import launch
+import launch_ros
+
 from launch import LaunchDescription  
-from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, LogInfo, PushRosNamespace  
-from launch.substitutions import LaunchConfiguration, FindPackageShare  
+from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
+from launch.substitutions import LaunchConfiguration  
 from launch_ros.actions import Node  
 import os  
+from ament_index_python import get_package_share_directory
 
 def generate_launch_description():  
     return LaunchDescription([  
@@ -18,7 +22,7 @@ def generate_launch_description():
         DeclareLaunchArgument('y', default_value='0.0', description='Y position of the robot'),  
         DeclareLaunchArgument('z', default_value='0.0', description='Z position of the robot'),  
         DeclareLaunchArgument('robot_name', default_value='pendulum', description='Name of the robot'),  
-        DeclareLaunchArgument('robot_file', default_value=os.path.join(FindPackageShare('pendulum_control'), 'urdf', 'cartpole.urdf'), description='Path to the robot URDF file'),  
+        DeclareLaunchArgument('robot_file', default_value=os.path.join(get_package_share_directory('pendulum'), 'urdf', 'cartpole.urdf'), description='Path to the robot URDF file'),  
 
         # Load robot description parameter  
         Node(  
@@ -32,7 +36,7 @@ def generate_launch_description():
 
         # Launch Gazebo with own world configuration  
         IncludeLaunchDescription(  
-            FindPackageShare('gazebo_ros') + '/launch/empty_world.launch.py',  
+            get_package_share_directory('pendulum') + '/launch/empty_world.launch.py',  
             launch_arguments={  
                 'world_name': 'worlds/empty.world',  
                 'debug': LaunchConfiguration('debug'),  

@@ -1,7 +1,10 @@
+import launch
+import launch_ros
 from launch import LaunchDescription  
 from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription  
-from launch.substitutions import LaunchConfiguration, FindPackageShare  
+from launch.substitutions import LaunchConfiguration  
 from launch_ros.actions import Node  
+from ament_index_python import get_package_share_directory
 
 def generate_launch_description():  
     return LaunchDescription([  
@@ -10,12 +13,12 @@ def generate_launch_description():
 
         # Include the spawn_gazebo.launch file  
         IncludeLaunchDescription(  
-            FindPackageShare('pendulum_control') + '/launch/spawn_gazebo.launch.py'  
+            get_package_share_directory('pendulum') + '/launch/spawn_gazebo.launch.py'  
         ),  
 
         # Launch the control node  
         Node(  
-            package='pendulum_control',  
+            package='pendulum',  
             executable='control',  # ROS 2 中的可执行文件名称  
             name='control',  
             output='screen',  
@@ -24,4 +27,3 @@ def generate_launch_description():
     ])
     
     
-import os

@@ -1,8 +1,9 @@
 <?xml version="1.0"?>
-<package format="2">
-  <name>pendulum_control</name>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>pendulum</name>
   <version>0.0.0</version>
-  <description>The pendulum_control package</description>
+  <description>The pendulum_sim package</description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag -->
   <!-- Example:  -->
@@ -13,7 +14,7 @@
   <!-- One license tag required, multiple allowed, one license per tag -->
   <!-- Commonly used license strings: -->
   <!--   BSD, MIT, Boost Software License, GPLv2, GPLv3, LGPLv2.1, LGPLv3 -->
-  <license>TODO</license>
+  <license>Apache-2.0</license>
 
 
   <buildtool_depend>ament_cmake</buildtool_depend>
