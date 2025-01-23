@@ -39,7 +39,7 @@ def generate_launch_description():
         output='screen',
         # arguments=[default_urdf_path],
         parameters=[{'robot_description':robot_description}],
-        # remappings=[('/joint_states', '/pendulum/joint_states')],
+        remappings=[('/joint_states', '/pendulum/joint_states')],
     )
     
     action_launch_gazeobo = launch.actions.IncludeLaunchDescription(
@@ -81,5 +81,5 @@ def generate_launch_description():
         action_robot_state_publisher,
         action_launch_gazeobo,
         action_spawn_entity,
-        # action_controller_spawner,
+        action_controller_spawner,
     ])
