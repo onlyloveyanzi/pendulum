@@ -43,7 +43,7 @@ public:
         command_msg.data = output;  
         command_pub->publish(command_msg);  
         last_balance_time = rclcpp::Clock().now();  
-        RCLCPP_INFO(rclcpp::get_logger("InvertedPendulumController"), "commanding: %f", command_msg.data);  
+        // RCLCPP_INFO(rclcpp::get_logger("InvertedPendulumController"), "commanding: %f", command_msg.data);  
     }  
 
     virtual double get_output() = 0;  
