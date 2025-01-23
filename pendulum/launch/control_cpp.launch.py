@@ -13,7 +13,7 @@ def generate_launch_description():
 
         # Include the spawn_gazebo.launch file  
         IncludeLaunchDescription(  
-            get_package_share_directory('pendulum') + '/launch/spawn_gazebo.launch.py'  
+            get_package_share_directory('pendulum') + '/launch/spawn_gazebo_sim.launch.py'  
         ),  
 
         # Launch the control node  

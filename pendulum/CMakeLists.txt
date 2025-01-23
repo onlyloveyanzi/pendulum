@@ -61,6 +61,9 @@ install(DIRECTORY include/
 
 install(DIRECTORY
   launch
+  world
+  urdf
+  script
   DESTINATION share/${PROJECT_NAME}/)
 
 # Ament package  
