@@ -18,6 +18,9 @@
             <plugin filename="libgazebo_ros2_control.so" name="gazebo_ros2_control">
                 <parameters>$(find pendulum)/config/pendulum_ros2_controller.yaml</parameters>
             </plugin>
+            <ros>
+                <remapping>/pendulum/joint_states:=/joint_states</remapping>
+            </ros>
         </gazebo>
     </xacro:macro>
 </robot>

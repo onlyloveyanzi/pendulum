@@ -14,7 +14,7 @@ public:
     {  
         command_pub = node->create_publisher<std_msgs::msg::Float64>("/pendulum/x_controller/command", 10);  
         joint_state_sub = node->create_subscription<sensor_msgs::msg::JointState>(  
-            "/joint_states", 10,  
+            "/pendulum/joint_states", 10,  
             std::bind(&InvertedPendulumController::jointStateCallback, this, std::placeholders::_1)  
         );  
 
