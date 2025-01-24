@@ -6,7 +6,7 @@ from launch.substitutions import LaunchConfiguration
 from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
 
 def generate_launch_description():
-    model_name = 'pendulume_sim'
+    model_name = 'pendulum_sim'
     
     declare_x = DeclareLaunchArgument(  
         'x', default_value='0.0', description='X position of the robot'  
@@ -17,13 +17,12 @@ def generate_launch_description():
     declare_z = DeclareLaunchArgument(  
         'z', default_value='0.0', description='Z position of the robot'  
     )  
-    declare_robot_name = DeclareLaunchArgument(  
-        'robot_name', default_value='pendulum', description='Name of the robot'  
-    )  
-    default_urdf_path = get_package_share_directory('pendulum') + '/urdf/cartpole.urdf'
+    # declare_robot_name = DeclareLaunchArgument(  
+    #     'robot_name', default_value='pendulum', description='Name of the robot'  
+    # )  
     default_xacro_path = get_package_share_directory('pendulum') + '/urdf/cartpole.urdf.xacro'
     default_gazeobo_path = get_package_share_directory('pendulum') + '/world/empty_world.world'
-    config_file_path = get_package_share_directory('pendulum_control')+'urdf'+ 'controller_config.yaml'  
+    config_file_path = get_package_share_directory('pendulum')+'urdf'+ 'controller_config.yaml'  
 
     #声明一个urdf目录的参数，方便修改
     action_declare_arg_model_path = launch.actions.DeclareLaunchArgument(
@@ -78,7 +77,7 @@ def generate_launch_description():
         declare_x,  
         declare_y,  
         declare_z,  
-        declare_robot_name,  
+        # declare_robot_name,  
         action_declare_arg_model_path,
         action_robot_state_publisher,
         action_launch_gazeobo,

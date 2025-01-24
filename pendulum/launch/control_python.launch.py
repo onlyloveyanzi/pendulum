@@ -18,7 +18,7 @@ def generate_launch_description():
 
         # Launch the control node  
         Node(  
-            package='pendulum_control',  
+            package='pendulum',  
             executable='control_py',  # ROS 2 中的可执行文件名称  
             name='control',  
             output='screen',  
