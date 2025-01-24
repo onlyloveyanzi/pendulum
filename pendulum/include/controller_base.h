@@ -4,6 +4,7 @@
 #include <rclcpp/rclcpp.hpp>  
 #include <sensor_msgs/msg/joint_state.hpp>  
 #include <std_msgs/msg/float64.hpp>  
+#include <std_msgs/msg/float64_multi_array.hpp>
 #include <Eigen/Dense>  
 #include <memory>  
 
@@ -12,9 +13,9 @@ class InvertedPendulumController
 public:  
     InvertedPendulumController(std::shared_ptr<rclcpp::Node> node)  
     {  
-        command_pub = node->create_publisher<std_msgs::msg::Float64>("/pendulum/x_controller/command", 10);  
+        command_pub = node->create_publisher<std_msgs::msg::Float64MultiArray>("/x_controller/commands", 10);  
         joint_state_sub = node->create_subscription<sensor_msgs::msg::JointState>(  
-            "/pendulum/joint_states", 10,  
+            "/joint_states", 10,  
             std::bind(&InvertedPendulumController::jointStateCallback, this, std::placeholders::_1)  
         );  
 
@@ -40,10 +41,11 @@ public:
     void balance()  
     {  
         double output = get_output();  
-        command_msg.data = output;  
-        command_pub->publish(command_msg);  
+        std_msgs::msg::Float64MultiArray cur_msg;  
+        cur_msg.data.push_back(output);
+        command_pub->publish(cur_msg);  
         last_balance_time = rclcpp::Clock().now();  
-        // RCLCPP_INFO(rclcpp::get_logger("InvertedPendulumController"), "commanding: %f", command_msg.data);  
+        RCLCPP_INFO(rclcpp::get_logger("InvertedPendulumController"), "commanding: %lf", output);  
     }  
 
     virtual double get_output() = 0;  
@@ -54,9 +56,9 @@ protected:
     rclcpp::Time last_balance_time;  
 
 private:  
-    rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr command_pub;  
+    rclcpp::Publisher<std_msgs::msg::Float64MultiArray>::SharedPtr command_pub;  
     rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr joint_state_sub;  
-    std_msgs::msg::Float64 command_msg;  
+    std_msgs::msg::Float64MultiArray command_msg;  
 };  
 
 #endif

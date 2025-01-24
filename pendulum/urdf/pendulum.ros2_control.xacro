@@ -5,13 +5,13 @@
             <hardware>
                 <plugin>gazebo_ros2_control/GazeboSystem</plugin>
             </hardware>
-            <joint name="cart_to_pole1">
+            <joint name="base_to_plat">
                 <command_interface name="effort" />
                 <state_interface name="position" />
                 <state_interface name="velocity" />
                 <state_interface name="effort" />
             </joint>
-            <joint name="base_to_plat">
+            <joint name="cart_to_pole1">
                 <command_interface name="effort" />
                 <state_interface name="position" />
                 <state_interface name="velocity" />
