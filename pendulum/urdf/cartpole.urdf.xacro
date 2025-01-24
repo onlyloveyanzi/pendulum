@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wili/xacro" name="pendulum">
+
+    <xacro:include filename="$(find pendulum)/urdf/cartpole_body.urdf.xacro" />
+    <xacro:body />
+
+    <xacro:include filename="$(find pendulum)/urdf/pendulum.ros2_control.xacro" />
+    <xacro:pendulum_ros2_control />
+
+</robot>

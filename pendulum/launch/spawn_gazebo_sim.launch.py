@@ -6,6 +6,8 @@ from launch.substitutions import LaunchConfiguration
 from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
 
 def generate_launch_description():
+    model_name = 'pendulume_sim'
+    
     declare_x = DeclareLaunchArgument(  
         'x', default_value='0.0', description='X position of the robot'  
     )  
@@ -19,29 +21,25 @@ def generate_launch_description():
         'robot_name', default_value='pendulum', description='Name of the robot'  
     )  
     default_urdf_path = get_package_share_directory('pendulum') + '/urdf/cartpole.urdf'
+    default_xacro_path = get_package_share_directory('pendulum') + '/urdf/cartpole.urdf.xacro'
     default_gazeobo_path = get_package_share_directory('pendulum') + '/world/empty_world.world'
     config_file_path = get_package_share_directory('pendulum_control')+'urdf'+ 'controller_config.yaml'  
 
-    # 声明一个URDF目录的参数，方便修改  
-    action_declare_arg_model_path = launch.actions.DeclareLaunchArgument(  
-        name='model', default_value=str(default_urdf_path), description='URDF path'  
-    )  
-
-    robot_description = launch_ros.parameter_descriptions.ParameterValue(  
-        launch.substitutions.Command(['cat ',launch.substitutions.LaunchConfiguration('model')]),  # 直接使用URDF路径  
-        value_type=str  
-    )  
+    #声明一个urdf目录的参数，方便修改
+    action_declare_arg_model_path = launch.actions.DeclareLaunchArgument(
+        name='model',default_value=str(default_xacro_path),description='xacro path'
+    )
+    
+    robot_description = launch_ros.parameter_descriptions.ParameterValue(
+        launch.substitutions.Command(['xacro ',launch.substitutions.LaunchConfiguration('model')]),
+        value_type=str
+    ) 
     
     
     action_robot_state_publisher = launch_ros.actions.Node(
         package='robot_state_publisher',
         executable='robot_state_publisher',
-        name='robot_state_publisher',
-        output='screen',
-        respawn=True,
-        # arguments=[default_urdf_path],
         parameters=[{'robot_description':robot_description}],
-        remappings=[('/joint_states', '/pendulum/joint_states')],
     )
     
     action_launch_gazeobo = launch.actions.IncludeLaunchDescription(
@@ -55,25 +53,26 @@ def generate_launch_description():
         package='gazebo_ros',
         executable='spawn_entity.py',
         arguments=[  
-                '-entity', 'pendulum' ,
-                '-topic', 'robot_description' , 
-                '-x', LaunchConfiguration('x'),  
-                '-y', LaunchConfiguration('y'),  
-                '-z', LaunchConfiguration('z'),   
-                
+                '-topic', '/robot_description' , 
+                '-entity', model_name ,                
             ] ,
         output='screen'
     )
     
     
-    action_controller_spawner = launch_ros.actions.Node(
-        package='controller_manager',
-        executable='spawner',
-        output='screen',
-        arguments=['joint_state_controller', 'x_controller'],
-        namespace='/pendulum',
+        # 加载并激活 fishbot_joint_state_broadcaster 控制器
+    load_joint_state_controller = launch.actions.ExecuteProcess(
+        cmd=['ros2', 'control', 'load_controller', '--set-state', 'active',
+            'cartpole_joint_state_broadcaster'],
+        output='screen'
     )
-           
+    
+    load_x_controller = launch.actions.ExecuteProcess(
+        cmd=['ros2', 'control', 'load_controller', '--set-state', 'active',
+            'x_controller'],
+        output='screen'
+    )
+    
 
     return launch.LaunchDescription([
         declare_x,  
@@ -84,5 +83,15 @@ def generate_launch_description():
         action_robot_state_publisher,
         action_launch_gazeobo,
         action_spawn_entity,
-        action_controller_spawner,
+        launch.actions.RegisterEventHandler(
+            event_handler=launch.event_handlers.OnProcessExit(
+                target_action=action_spawn_entity,
+                on_exit=[load_joint_state_controller],)
+            ),
+        # 事件动作，load_fishbot_diff_drive_controller
+        launch.actions.RegisterEventHandler(
+        event_handler=launch.event_handlers.OnProcessExit(
+            target_action=load_joint_state_controller,
+            on_exit=[load_x_controller],)
+            ),
     ])

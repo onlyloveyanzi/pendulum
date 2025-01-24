@@ -64,6 +64,7 @@ install(DIRECTORY
   world
   urdf
   script
+  config
   DESTINATION share/${PROJECT_NAME}/)
 
 # Ament package  
