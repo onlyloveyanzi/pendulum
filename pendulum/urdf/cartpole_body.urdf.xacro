@@ -50,16 +50,6 @@
             <limit effort="100000.0" lower="-15" upper="15" velocity="100" />
             <dynamics damping="0.0" friction="0.0" />
         </joint>
-        <transmission name="tran2">
-            <type>transmission_interface/SimpleTransmission</type>
-            <joint name="base_to_plat">
-                <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
-            </joint>
-            <actuator name="planar_motor_2">
-                <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
-                <mechanicalReduction>1</mechanicalReduction>
-            </actuator>
-        </transmission>
 
         <link name="pole1">
             <visual>
@@ -86,16 +76,6 @@
             <dynamics damping="0.0" friction="0.0" />
             <limit effort="100000.0" lower="-3.14" upper="3.14" velocity="50" />
         </joint>
-        <transmission name="tran3">
-            <type>transmission_interface/SimpleTransmission</type>
-            <joint name="cart_to_pole1">
-                <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
-            </joint>
-            <actuator name="rev_motor">
-                <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
-                <mechanicalReduction>1</mechanicalReduction>
-            </actuator>
-        </transmission>
     </xacro:macro>
 
 

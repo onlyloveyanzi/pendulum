@@ -23,15 +23,17 @@ Eigen, OsqpEigen
 Launch LQR controller:
 ```bash
 source install/setup.bash
-roslaunch ros2 run control_python.launch controller:=LQR # or
-roslaunch ros2 run control_cpp.launch controller:=LQR 
+ros2 launch pendulum control_python.launch.py controller:=LQR # or
+ros2 launch pendulum control_cpp.launch.py controller:=LQR
+
 ```
 
 Launch MPC controller:
 ```bash
 source install/setup.bash
-roslaunch ros2 run control_python.launch controller:=MPC # or
-roslaunch ros2 run control_cpp.launch controller:=MPC
+ros2 launch pendulum control_python.launch.py controller:=MPC # or
+ros2 launch pendulum control_cpp.launch.py controller:=MPC
+
 ```
 
 In Gazebo, right-click on the pole to apply a force and observe the stabilization process.
