@@ -43,7 +43,7 @@ public:
         double output = get_output();  
         std_msgs::msg::Float64MultiArray cur_msg;  
         cur_msg.data.push_back(output);
-        command_pub->publish(cur_msg);  
+        // command_pub->publish(cur_msg);  
         last_balance_time = rclcpp::Clock().now();  
         RCLCPP_INFO(rclcpp::get_logger("InvertedPendulumController"), "commanding: %lf", output);  
     }  

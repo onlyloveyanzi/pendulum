@@ -11,10 +11,10 @@ class InvertedPendulumController(Node):
         super().__init__('inverted_pendulum_controller')  
 
         # Publisher: Command force to the pendulum  
-        self.command_pub = self.create_publisher(Float64, '/pendulum/x_controller/command', 10)  
+        self.command_pub = self.create_publisher(Float64, '/x_controller/command', 10)  
 
         # Subscriber: Get joint states  
-        self.joint_state_subscriber = self.create_subscription(JointState, '/pendulum/joint_states',   
+        self.joint_state_subscriber = self.create_subscription(JointState, '/joint_states',   
             self.joint_state_callback, 10)  
 
         # Initialize state variables  

@@ -24,6 +24,7 @@ include_directories(
 add_library(controller_libs  
   src/controller_lqr.cpp  
   src/controller_mpc.cpp  
+  src/controller_pid.cpp  
 )  
 
 # Link libraries  z

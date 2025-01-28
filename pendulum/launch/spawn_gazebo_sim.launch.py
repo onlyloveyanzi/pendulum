@@ -21,8 +21,7 @@ def generate_launch_description():
     #     'robot_name', default_value='pendulum', description='Name of the robot'  
     # )  
     default_xacro_path = get_package_share_directory('pendulum') + '/urdf/cartpole.urdf.xacro'
-    default_gazeobo_path = get_package_share_directory('pendulum') + '/world/empty_world.world'
-    config_file_path = get_package_share_directory('pendulum')+'urdf'+ 'controller_config.yaml'  
+    default_gazeobo_path = get_package_share_directory('pendulum') + '/world/empty_world.world'  
 
     #声明一个urdf目录的参数，方便修改
     action_declare_arg_model_path = launch.actions.DeclareLaunchArgument(
@@ -33,7 +32,6 @@ def generate_launch_description():
         launch.substitutions.Command(['xacro ',launch.substitutions.LaunchConfiguration('model')]),
         value_type=str
     ) 
-    
     
     action_robot_state_publisher = launch_ros.actions.Node(
         package='robot_state_publisher',
@@ -58,7 +56,6 @@ def generate_launch_description():
         output='screen'
     )
     
-    
         # 加载并激活 fishbot_joint_state_broadcaster 控制器
     load_joint_state_controller = launch.actions.ExecuteProcess(
         cmd=['ros2', 'control', 'load_controller', '--set-state', 'active',
@@ -71,7 +68,6 @@ def generate_launch_description():
             'x_controller'],
         output='screen'
     )
-    
 
     return launch.LaunchDescription([
         declare_x,  

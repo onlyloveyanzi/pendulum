@@ -86,7 +86,7 @@
             <dynamics damping="0.0" friction="0.0" />
             <limit effort="100000.0" lower="-3.14" upper="3.14" velocity="50" />
         </joint>
-        <transmission name="tran3">
+        <!-- <transmission name="tran3">
             <type>transmission_interface/SimpleTransmission</type>
             <joint name="cart_to_pole1">
                 <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
@@ -95,7 +95,7 @@
                 <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
                 <mechanicalReduction>1</mechanicalReduction>
             </actuator>
-        </transmission>
+        </transmission> -->
     </xacro:macro>
 
 
