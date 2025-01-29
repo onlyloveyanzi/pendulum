@@ -7,6 +7,7 @@
 #include "controller_base.h"
 #include "controller_lqr.h"
 #include "controller_mpc.h"
+#include "controller_pid.h"
 
 const int control_freq = 100;
 
@@ -26,6 +27,8 @@ Eigen::Matrix<double, 4, 1> B;
 
 Eigen::Matrix4d Q;
 Eigen::Matrix<double, 1, 1> R;
+
+
 
 int main(int argc, char **argv)
 {
@@ -51,20 +54,20 @@ int main(int argc, char **argv)
         0.0, 0.0, 0.0, 10.0;
     R << 0.1;
 
-    std::unique_ptr<InvertedPendulumController> controller1;
-    std::unique_ptr<InvertedPendulumController> controller2;
+    std::unique_ptr<InvertedPendulumController> controller;
+
     if (CONTROLLER == "LQR")
     {
-        controller1 = std::make_unique<LQRInvertedPendulumController>(node, A, B, Q, R);
+        controller = std::make_unique<LQRInvertedPendulumController>(node, A, B, Q, R);
     }
     else if (CONTROLLER == "MPC")
     {
-        controller1 = std::make_unique<MPCInvertedPendulumController>(node, A, B, Q, R, 0.02);
+        controller = std::make_unique<MPCInvertedPendulumController>(node, A, B, Q, R, 0.02);
     }
     else if (CONTROLLER == "PID")
     {
-        controller1 = std::make_unique<MPCInvertedPendulumController>(node, A, B, 0.02, 80, 0, 15);
-        controller2 = std::make_unique<MPCInvertedPendulumController>(node, A, B, 0.02, 2, 0.1, 5.0);
+        controller = std::make_unique<PIDInvertedPendulumController>(node, A, B, 0.02);
+
     }
     else
     {
@@ -75,12 +78,7 @@ int main(int argc, char **argv)
     while (rclcpp::ok())
     {
         rclcpp::spin_some(node);
-        if(CONTROLLER == "PID"){
-            controller1->update();
-        }else{
-            controller->balance();
-        }
-        
+        controller->balance();
         loop_rate.sleep();
     }
 

@@ -1,41 +1,45 @@
 #include <controller_pid.h>
 
-
 double PIDInvertedPendulumController::get_output()
 {
     // 计算误差
-    double error = desired_state(0) - current_state(0);
-    return error;
+    double F_ff = 0;
+    // double F_ff = computeFeedforward(current_state(2), current_state(3));
+    // double F_trans = 0;
+    double F_trans = transController->compute(current_state(0) - desired_state(0), dt_);
+    double F_angle = angleController->compute(desired_state(2) - current_state(2), dt_);
+    double total = F_angle + F_trans + F_ff;
+    return total;
 }
 
-double PIDInvertedPendulumController::compute(double setpoint, double measurement)
+// 前馈控制量计算函数
+
+double PIDInvertedPendulumController::computeFeedforward(double theta, double theta_dot)
 {
-    double err = setpoint - measurement;
-    integral += err * dt_;
-    double derivative = (err - prev_err) / dt_;
-    prev_err = err;
-
-    double output = Kp_ * err + Ki_ * integral + Kd_ * derivative;
-
-    // 抗饱和处理
-    if (output > max_out)
-        return max_out;
-    if (output < -max_out)
-        return -max_out;
-    return output;
+    double sin_theta = sin(theta);
+    double cos_theta = cos(theta);
+    // 防止除以零 (角度接近±90°时保护)
+    if (fabs(cos_theta) < 1e-3)
+        cos_theta = 1e-3 * (cos_theta > 0 ? 1 : -1);
+    // 前馈力计算公式
+    return ((model.M + model.m) * model.g * sin_theta - model.m * model.l * pow(theta_dot, 2) * sin_theta) / cos_theta;
 }
 
-void PIDInvertedPendulumController::update(double F, double dt)
-{
-    // 简化的线性化动力学方程
-    const double sin_theta = sin(current_state[2]);
-    const double cos_theta = cos(current_state[2]);
+// double computeFeedforward(
+//     double theta, double theta_dot, double theta_ddot,
+//     double x_ref, double x, double dx_ref, double dx,
+//     double Kp_x, double Kd_x, double M, double m, double l, double g)
+// {
+//     // 计算目标加速度
+//     double x_err = x_ref - x;
+//     double dx_err = dx_ref - dx;
+//     double ddx_ref = Kp_x * x_err + Kd_x * dx_err;
 
-    // current_state = A * current_state + B * F;  
+//     // 平衡补偿项
+//     double balance_ff = ((M + m) * g * sin(theta)) / cos(theta);
 
-    // 欧拉积分
-    // state.dx += x_accel * dt;
-    // state.x += state.dx * dt;
-    // state.dtheta += theta_accel * dt;
-    // state.theta += state.dtheta * dt;
-}
+//     // 平移补偿项
+//     double translation_ff = (M + m) * ddx_ref - m * l * theta_ddot * cos(theta) + m * l * pow(theta_dot, 2) * sin(theta);
+
+//     return balance_ff + translation_ff;
+// }

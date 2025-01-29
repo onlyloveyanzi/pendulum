@@ -31,7 +31,8 @@ Launch MPC controller:
 ```bash
 source devel/setup.bash
 roslaunch pendulum_control control_python.launch controller:=MPC # or
-roslaunch pendulum_control control_cpp.launch controller:=MPC
+ros2 launch pendulum control_cpp.launch.py controller:=MPC
+ros2 launch pendulum control_py.launch.py controller:=MPC
 ```
 
 In Gazebo, right-click on the pole to apply a force and observe the stabilization process.

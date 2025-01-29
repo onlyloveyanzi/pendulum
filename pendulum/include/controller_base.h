@@ -1,64 +1,75 @@
-#ifndef CONTROLLER_BASE_H  
-#define CONTROLLER_BASE_H  
+#ifndef CONTROLLER_BASE_H
+#define CONTROLLER_BASE_H
 
-#include <rclcpp/rclcpp.hpp>  
-#include <sensor_msgs/msg/joint_state.hpp>  
-#include <std_msgs/msg/float64.hpp>  
+#include <rclcpp/rclcpp.hpp>
+#include <sensor_msgs/msg/joint_state.hpp>
+#include <std_msgs/msg/float64.hpp>
 #include <std_msgs/msg/float64_multi_array.hpp>
-#include <Eigen/Dense>  
-#include <memory>  
+#include <Eigen/Dense>
+#include <memory>
 
-class InvertedPendulumController  
-{  
-public:  
-    InvertedPendulumController(std::shared_ptr<rclcpp::Node> node)  
-    {  
-        command_pub = node->create_publisher<std_msgs::msg::Float64MultiArray>("/x_controller/commands", 10);  
-        joint_state_sub = node->create_subscription<sensor_msgs::msg::JointState>(  
-            "/joint_states", 10,  
-            std::bind(&InvertedPendulumController::jointStateCallback, this, std::placeholders::_1)  
-        );  
+struct pendulumModel
+{
+    double M = 2.0;
+    double m = 0.1;
+    double g = 9.8;
+    double l = 0.5 / 2.0;
+    double I = 1.0 / 3.0 * m * l * l;
+    double b = 0.0;
+    double P = (M + m) * I + M * m * l * l;
 
-        current_state << 0.0, 0.0, 0.0, 0.0;  
-        desired_state << 0.0, 0.0, 0.0, 0.0;  
-    }  
+};
 
-    virtual ~InvertedPendulumController() {}  
+class InvertedPendulumController
+{
+public:
+    InvertedPendulumController(std::shared_ptr<rclcpp::Node> node)
+    {
+        command_pub = node->create_publisher<std_msgs::msg::Float64MultiArray>("/x_controller/commands", 10);
+        joint_state_sub = node->create_subscription<sensor_msgs::msg::JointState>(
+            "/joint_states", 10,
+            std::bind(&InvertedPendulumController::jointStateCallback, this, std::placeholders::_1));
 
-    void jointStateCallback(const sensor_msgs::msg::JointState::SharedPtr data)  
-    {  
-        current_state(0) = data->position[0];  
-        current_state(1) = data->velocity[0];  
-        current_state(2) = -data->position[1];  
-        current_state(3) = -data->velocity[1];  
+        current_state << 0.0, 0.0, 0.0, 0.0;
+        desired_state << 0.0, 0.0, 0.0, 0.0;
+    }
 
-        RCLCPP_INFO(rclcpp::get_logger("InvertedPendulumController"), "x_pos: %f m", current_state(0));  
-        RCLCPP_INFO(rclcpp::get_logger("InvertedPendulumController"), "x_vel: %f m/s", current_state(1));  
-        RCLCPP_INFO(rclcpp::get_logger("InvertedPendulumController"), "theta_pos: %f rad", current_state(2));  
-        RCLCPP_INFO(rclcpp::get_logger("InvertedPendulumController"), "theta_vel: %f rad/s", current_state(3));  
-    }  
+    virtual ~InvertedPendulumController() {}
 
-    void balance()  
-    {  
-        double output = get_output();  
-        std_msgs::msg::Float64MultiArray cur_msg;  
+    void jointStateCallback(const sensor_msgs::msg::JointState::SharedPtr data)
+    {
+        current_state(0) = data->position[0];
+        current_state(1) = data->velocity[0];
+        current_state(2) = -data->position[1];
+        current_state(3) = -data->velocity[1];
+
+        RCLCPP_INFO(rclcpp::get_logger("InvertedPendulumController"), "x_pos: %f m", current_state(0));
+        RCLCPP_INFO(rclcpp::get_logger("InvertedPendulumController"), "x_vel: %f m/s", current_state(1));
+        RCLCPP_INFO(rclcpp::get_logger("InvertedPendulumController"), "theta_pos: %f rad", current_state(2));
+        RCLCPP_INFO(rclcpp::get_logger("InvertedPendulumController"), "theta_vel: %f rad/s", current_state(3));
+    }
+
+    void balance()
+    {
+        double output = get_output();
+        std_msgs::msg::Float64MultiArray cur_msg;
         cur_msg.data.push_back(output);
-        // command_pub->publish(cur_msg);  
-        last_balance_time = rclcpp::Clock().now();  
-        RCLCPP_INFO(rclcpp::get_logger("InvertedPendulumController"), "commanding: %lf", output);  
-    }  
+        command_pub->publish(cur_msg);
+        last_balance_time = rclcpp::Clock().now();
+        RCLCPP_INFO(rclcpp::get_logger("InvertedPendulumController"), "commanding: %lf", output);
+    }
 
-    virtual double get_output() = 0;  
+    virtual double get_output() = 0;
 
-protected:  
-    Eigen::Vector4d current_state;  
-    Eigen::Vector4d desired_state;  
-    rclcpp::Time last_balance_time;  
+protected:
+    Eigen::Vector4d current_state;
+    Eigen::Vector4d desired_state;
+    rclcpp::Time last_balance_time;
 
-private:  
-    rclcpp::Publisher<std_msgs::msg::Float64MultiArray>::SharedPtr command_pub;  
-    rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr joint_state_sub;  
-    std_msgs::msg::Float64MultiArray command_msg;  
-};  
+private:
+    rclcpp::Publisher<std_msgs::msg::Float64MultiArray>::SharedPtr command_pub;
+    rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr joint_state_sub;
+    std_msgs::msg::Float64MultiArray command_msg;
+};
 
 #endif
