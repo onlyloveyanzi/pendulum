@@ -1,13 +1,16 @@
 #include <controller_pid.h>
+#include <iostream>
 
 double PIDInvertedPendulumController::get_output()
 {
     // 计算误差
     double F_ff = 0;
     // double F_ff = computeFeedforward(current_state(2), current_state(3));
+    // double F_ff = computeFeedforwardNonlinear();
     // double F_trans = 0;
     double F_trans = transController->compute(current_state(0) - desired_state(0), dt_);
-    double F_angle = angleController->compute(desired_state(2) - current_state(2), dt_);
+    // double F_angle = 0;
+    double F_angle = angleController->compute(current_state(2) - desired_state(2), dt_);
     double total = F_angle + F_trans + F_ff;
     return total;
 }
@@ -25,21 +28,24 @@ double PIDInvertedPendulumController::computeFeedforward(double theta, double th
     return ((model.M + model.m) * model.g * sin_theta - model.m * model.l * pow(theta_dot, 2) * sin_theta) / cos_theta;
 }
 
-// double computeFeedforward(
-//     double theta, double theta_dot, double theta_ddot,
-//     double x_ref, double x, double dx_ref, double dx,
-//     double Kp_x, double Kd_x, double M, double m, double l, double g)
-// {
-//     // 计算目标加速度
-//     double x_err = x_ref - x;
-//     double dx_err = dx_ref - dx;
-//     double ddx_ref = Kp_x * x_err + Kd_x * dx_err;
+double PIDInvertedPendulumController::computeFeedforwardNonlinear()
+{
+    // 1. 计算目标加速度
+    double x_error = current_state[0] - desired_state[0];
+    double dx_error = current_state[1] - desired_state[1];
+    double ddx_ref = 3.0 * x_error + 2.0 * dx_error;
 
-//     // 平衡补偿项
-//     double balance_ff = ((M + m) * g * sin(theta)) / cos(theta);
+    // 2. 非线性平衡补偿项
+    double sin_theta = sin(current_state[2]);
+    double cos_theta = cos(current_state[2]);
+    RCLCPP_INFO(rclcpp::get_logger("InvertedPendulumController"), "sin theta: %f m", sin_theta);
+    RCLCPP_INFO(rclcpp::get_logger("InvertedPendulumController"), "cos theta: %f m", cos_theta);
+    if (fabs(cos_theta) < 1e-3)
+        cos_theta = 1e-3 * (cos_theta > 0 ? 1 : -1); // 防止除以零
+    double balance_ff = ((model.M + model.m) * model.g * sin_theta - model.m * model.l * pow(current_state[3], 2) * sin_theta) / cos_theta;
 
-//     // 平移补偿项
-//     double translation_ff = (M + m) * ddx_ref - m * l * theta_ddot * cos(theta) + m * l * pow(theta_dot, 2) * sin(theta);
+    // 3. 平移补偿项
+    double translation_ff = (model.M + model.m) * ddx_ref;
 
-//     return balance_ff + translation_ff;
-// }
+    return balance_ff + translation_ff;
+}

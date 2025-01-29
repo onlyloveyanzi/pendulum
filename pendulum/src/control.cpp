@@ -17,7 +17,7 @@ const double g = 9.8;
 const double l = 0.5 / 2.0;
 const double I = 1.0 / 3.0 * m * l * l;
 const double b = 0.0;
-const double P = (M + m) * I + M * m * l * l;
+const double P = (M + m) * I + M * m * l * l - m * m * l * l;
 
 std::string CONTROLLER;
 
@@ -27,8 +27,6 @@ Eigen::Matrix<double, 4, 1> B;
 
 Eigen::Matrix4d Q;
 Eigen::Matrix<double, 1, 1> R;
-
-
 
 int main(int argc, char **argv)
 {
@@ -43,10 +41,10 @@ int main(int argc, char **argv)
     rclcpp::Rate loop_rate(control_freq);
 
     A << 0, 1, 0, 0,
-        0, -b * (I + m * l * l) / P, m * m * g * l * l / P, 0,
+        0, -b * (I + m * l * l) / P, -1 * m * m * g * l * l / P, 0,
         0, 0, 0, 1,
         0, -b * m * l / P, m * g * l * (M + m) / P, 0;
-    B << 0, (I + m * l * l) / P, 0, m * l / P;
+    B << 0, (I + m * l * l) / P, 0, -1 * m * l / P;
 
     Q << 10.0, 0.0, 0.0, 0.0,
         0.0, 10.0, 0.0, 0.0,
@@ -67,7 +65,6 @@ int main(int argc, char **argv)
     else if (CONTROLLER == "PID")
     {
         controller = std::make_unique<PIDInvertedPendulumController>(node, A, B, 0.02);
-
     }
     else
     {

@@ -20,6 +20,7 @@ public:
 
     double get_output() override;
     double computeFeedforward(double, double);
+    double computeFeedforwardNonlinear();
 
 private:
     Eigen::Matrix4d A_;
@@ -27,6 +28,6 @@ private:
     double dt_;
     pendulumModel model;
 
-    PIDController* transController;
-    PIDController* angleController;
+    PIDController *transController;
+    PIDController *angleController;
 };

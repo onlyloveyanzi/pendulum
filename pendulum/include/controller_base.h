@@ -40,13 +40,13 @@ public:
     {
         current_state(0) = data->position[0];
         current_state(1) = data->velocity[0];
-        current_state(2) = -data->position[1];
-        current_state(3) = -data->velocity[1];
+        current_state(2) = data->position[1];
+        current_state(3) = data->velocity[1];
 
-        RCLCPP_INFO(rclcpp::get_logger("InvertedPendulumController"), "x_pos: %f m", current_state(0));
-        RCLCPP_INFO(rclcpp::get_logger("InvertedPendulumController"), "x_vel: %f m/s", current_state(1));
-        RCLCPP_INFO(rclcpp::get_logger("InvertedPendulumController"), "theta_pos: %f rad", current_state(2));
-        RCLCPP_INFO(rclcpp::get_logger("InvertedPendulumController"), "theta_vel: %f rad/s", current_state(3));
+        // RCLCPP_INFO(rclcpp::get_logger("InvertedPendulumController"), "x_pos: %f m", current_state(0));
+        // RCLCPP_INFO(rclcpp::get_logger("InvertedPendulumController"), "x_vel: %f m/s", current_state(1));
+        // RCLCPP_INFO(rclcpp::get_logger("InvertedPendulumController"), "theta_pos: %f rad", current_state(2));
+        // RCLCPP_INFO(rclcpp::get_logger("InvertedPendulumController"), "theta_vel: %f rad/s", current_state(3));
     }
 
     void balance()
