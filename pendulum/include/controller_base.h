@@ -31,27 +31,34 @@ public:
             std::bind(&InvertedPendulumController::jointStateCallback, this, std::placeholders::_1));
 
         current_state << 0.0, 0.0, 0.0, 0.0;
-        desired_state << 0.0, 0.0, 0.0, 0.0;
+        desired_state << 2.0, 0.0, 0.0, 0.0;
     }
 
     virtual ~InvertedPendulumController() {}
 
     void jointStateCallback(const sensor_msgs::msg::JointState::SharedPtr data)
     {
+        double xDotDot = (data->velocity[0] - current_state[1])/0.01;
+        double thetaDotDot = (data->velocity[1] - current_state[3])/0.01;
+
+        RCLCPP_INFO(rclcpp::get_logger("InvertedPendulumController"), "xDotDot: %f m", xDotDot);
+        RCLCPP_INFO(rclcpp::get_logger("InvertedPendulumController"), "thetaDotDot: %f m", thetaDotDot);
+
         current_state(0) = data->position[0];
         current_state(1) = data->velocity[0];
         current_state(2) = data->position[1];
         current_state(3) = data->velocity[1];
 
-        // RCLCPP_INFO(rclcpp::get_logger("InvertedPendulumController"), "x_pos: %f m", current_state(0));
-        // RCLCPP_INFO(rclcpp::get_logger("InvertedPendulumController"), "x_vel: %f m/s", current_state(1));
-        // RCLCPP_INFO(rclcpp::get_logger("InvertedPendulumController"), "theta_pos: %f rad", current_state(2));
-        // RCLCPP_INFO(rclcpp::get_logger("InvertedPendulumController"), "theta_vel: %f rad/s", current_state(3));
+        RCLCPP_INFO(rclcpp::get_logger("InvertedPendulumController"), "x_pos: %f m", current_state(0));
+        RCLCPP_INFO(rclcpp::get_logger("InvertedPendulumController"), "x_vel: %f m/s", current_state(1));
+        RCLCPP_INFO(rclcpp::get_logger("InvertedPendulumController"), "theta_pos: %f rad", current_state(2));
+        RCLCPP_INFO(rclcpp::get_logger("InvertedPendulumController"), "theta_vel: %f rad/s", current_state(3));
     }
 
     void balance()
     {
         double output = get_output();
+        RCLCPP_INFO(rclcpp::get_logger("InvertedPendulumController"), "F: %lf", output);
         std_msgs::msg::Float64MultiArray cur_msg;
         cur_msg.data.push_back(output);
         command_pub->publish(cur_msg);
