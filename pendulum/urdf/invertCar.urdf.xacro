@@ -1,0 +1,87 @@
+<?xml version="1.0"?>  
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="pendulum">  
+
+  <!-- 定义参数 -->  
+  <xacro:property name="cart_length" value="0.5"/>  
+  <xacro:property name="cart_width" value="0.2"/>  
+  <xacro:property name="cart_height" value="0.1"/>  
+  <xacro:property name="wheel_radius" value="0.05"/>  
+  <xacro:property name="wheel_length" value="0.1"/>  
+  <xacro:property name="pendulum_radius" value="0.02"/>  
+  <xacro:property name="pendulum_length" value="0.5"/>  
+
+  <!-- 定义车身 -->  
+  <link name="cart_body">  
+    <visual>  
+      <geometry>  
+        <box size="${cart_length} ${cart_width} ${cart_height}"/> <!-- 长方体车身 -->  
+      </geometry>  
+      <material name="blue">  
+        <color rgba="0 0 1 1"/>  
+      </material>  
+    </visual>  
+    <collision>  
+      <geometry>  
+        <box size="${cart_length} ${cart_width} ${cart_height}"/>  
+      </geometry>  
+    </collision>  
+  </link>  
+
+  <!-- 定义轮胎 -->  
+  <link name="wheel">  
+    <visual>  
+      <geometry>  
+        <cylinder radius="${wheel_radius}" length="${wheel_length}"/> <!-- 轮胎 -->  
+      </geometry>  
+      <material name="black">  
+        <color rgba="0 0 0 1"/>  
+      </material>  
+    </visual>  
+    <collision>  
+      <geometry>  
+        <cylinder radius="${wheel_radius}" length="${wheel_length}"/>  
+      </geometry>  
+    </collision>  
+  </link>  
+
+  <!-- 定义轮胎的接触 -->  
+  <xacro:macro name="wheel_joint" params="name x y z">  
+    <joint name="${name}" type="revolute">  
+      <parent link="cart_body"/>  
+      <child link="wheel"/>  
+      <origin xyz="${x} ${y} ${z}" rpy="0 0 0"/> <!-- 轮胎位置 -->  
+      <axis xyz="0 0 1"/> <!-- 轮胎转动轴 -->  
+    </joint>  
+  </xacro:macro>  
+
+  <xacro:wheel_joint name="wheel1_joint" x="-${cart_length/4}" y="-${cart_width/2}" z="-${wheel_length/2}"/>  
+  <xacro:wheel_joint name="wheel2_joint" x="-${cart_length/4}" y="${cart_width/2}" z="-${wheel_length/2}"/>  
+  <xacro:wheel_joint name="wheel3_joint" x="${cart_length/4}" y="-${cart_width/2}" z="-${wheel_length/2}"/>  
+  <xacro:wheel_joint name="wheel4_joint" x="${cart_length/4}" y="${cart_width/2}" z="-${wheel_length/2}"/>  
+
+  <!-- 定义倒立摆 -->  
+  <link name="pendulum">  
+    <visual>  
+      <geometry>  
+        <cylinder radius="${pendulum_radius}" length="${pendulum_length}"/> <!-- 倒立摆 -->  
+      </geometry>  
+      <material name="red">  
+        <color rgba="1 0 0 1"/>  
+      </material>  
+    </visual>  
+    <collision>  
+      <geometry>  
+        <cylinder radius="${pendulum_radius}" length="${pendulum_length}"/>  
+      </geometry>  
+    </collision>  
+  </link>  
+
+  <!-- 定义倒立摆的连接 -->  
+  <joint name="pendulum_joint" type="revolute">  
+    <parent link="cart_body"/>  
+    <child link="pendulum"/>  
+    <origin xyz="0 0 ${cart_height/2}" rpy="0 0 0"/> <!-- 倒立摆位置 -->  
+    <axis xyz="0 1 0"/> <!-- 倒立摆转动轴 -->  
+  </joint>  
+
+</robot>

@@ -14,7 +14,7 @@ public:
     {
         // RCLCPP_INFO(rclcpp::get_logger("PIDInvertedPendulumController"));
         // RCLCPP_INFO(rclcpp::get_logger("PIDInvertedPendulumController"), "Kp: %f", Kp);
-        angleController = new PIDController(80.0, 0.0, 15.0);
+        angleController = new PIDController(80.0, 5, 15.0);
         transController = new PIDController(2, 0.1, 5.0);
     }
 

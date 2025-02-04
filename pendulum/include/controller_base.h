@@ -8,6 +8,16 @@
 #include <Eigen/Dense>
 #include <memory>
 
+const double thetaRef = 5.0 / 180.0 * 3.14;
+const double posRef = 0;
+const double M = 2.0;
+const double m = 0.1;
+const double g = 9.8;
+const double l = 0.5 / 2.0;
+const double I = 1.0 / 3.0 * m * l * l;
+const double b = 0.0;
+const double P = (M + m) * I + M * m * l * l - m * m * l * l;
+
 struct pendulumModel
 {
     double M = 2.0;
@@ -31,34 +41,34 @@ public:
             std::bind(&InvertedPendulumController::jointStateCallback, this, std::placeholders::_1));
 
         current_state << 0.0, 0.0, 0.0, 0.0;
-        desired_state << 2.0, 0.0, 0.0, 0.0;
+        desired_state << 0.0, 0.0, 0.0, 0.0;
     }
 
     virtual ~InvertedPendulumController() {}
 
     void jointStateCallback(const sensor_msgs::msg::JointState::SharedPtr data)
     {
-        double xDotDot = (data->velocity[0] - current_state[1])/0.01;
-        double thetaDotDot = (data->velocity[1] - current_state[3])/0.01;
+        // double xDotDot = (data->velocity[0] - current_state[1])/0.01;
+        // double thetaDotDot = (data->velocity[1] - current_state[3])/0.01;
 
-        RCLCPP_INFO(rclcpp::get_logger("InvertedPendulumController"), "xDotDot: %f m", xDotDot);
-        RCLCPP_INFO(rclcpp::get_logger("InvertedPendulumController"), "thetaDotDot: %f m", thetaDotDot);
+        // RCLCPP_INFO(rclcpp::get_logger("InvertedPendulumController"), "xDotDot: %f m", xDotDot);
+        // RCLCPP_INFO(rclcpp::get_logger("InvertedPendulumController"), "thetaDotDot: %f m", thetaDotDot);
 
-        current_state(0) = data->position[0];
+        current_state(0) = data->position[0] - posRef;
         current_state(1) = data->velocity[0];
-        current_state(2) = data->position[1];
+        current_state(2) = thetaRef - data->position[1];
         current_state(3) = data->velocity[1];
 
         RCLCPP_INFO(rclcpp::get_logger("InvertedPendulumController"), "x_pos: %f m", current_state(0));
-        RCLCPP_INFO(rclcpp::get_logger("InvertedPendulumController"), "x_vel: %f m/s", current_state(1));
-        RCLCPP_INFO(rclcpp::get_logger("InvertedPendulumController"), "theta_pos: %f rad", current_state(2));
-        RCLCPP_INFO(rclcpp::get_logger("InvertedPendulumController"), "theta_vel: %f rad/s", current_state(3));
+        // RCLCPP_INFO(rclcpp::get_logger("InvertedPendulumController"), "x_vel: %f m/s", current_state(1));
+        RCLCPP_INFO(rclcpp::get_logger("InvertedPendulumController"), "theta_pos: %f degree", current_state(2)/3.14*180);
+        // RCLCPP_INFO(rclcpp::get_logger("InvertedPendulumController"), "theta_vel: %f rad/s", current_state(3));
     }
 
     void balance()
     {
         double output = get_output();
-        RCLCPP_INFO(rclcpp::get_logger("InvertedPendulumController"), "F: %lf", output);
+        // RCLCPP_INFO(rclcpp::get_logger("InvertedPendulumController"), "F: %lf", output);
         std_msgs::msg::Float64MultiArray cur_msg;
         cur_msg.data.push_back(output);
         command_pub->publish(cur_msg);

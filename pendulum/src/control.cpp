@@ -11,19 +11,16 @@
 
 const int control_freq = 100;
 
-const double M = 2.0;
-const double m = 0.1;
-const double g = 9.8;
-const double l = 0.5 / 2.0;
-const double I = 1.0 / 3.0 * m * l * l;
-const double b = 0.0;
-const double P = (M + m) * I + M * m * l * l - m * m * l * l;
+
 
 std::string CONTROLLER;
 
 // A and B matrices
 Eigen::Matrix4d A;
 Eigen::Matrix<double, 4, 1> B;
+
+Eigen::Matrix4d AA;
+Eigen::Matrix<double, 4, 1> BB;
 
 Eigen::Matrix4d Q;
 Eigen::Matrix<double, 1, 1> R;
@@ -44,7 +41,12 @@ int main(int argc, char **argv)
         0, -b * (I + m * l * l) / P, -1 * m * m * g * l * l / P, 0,
         0, 0, 0, 1,
         0, -b * m * l / P, m * g * l * (M + m) / P, 0;
+    AA << 0, 1, 0, 0,
+        0, -b * (I + m * l * l) / P, -1 * m * m * g * l * l / P, 0,
+        0, 0, 0, -1,
+        0, -b * m * l / P, -1*m * g * l * (M + m) / P, 0;
     B << 0, (I + m * l * l) / P, 0, -1 * m * l / P;
+    BB << 0, (I + m * l * l) / P, 0, -1 * m * l / P;
 
     Q << 10.0, 0.0, 0.0, 0.0,
         0.0, 10.0, 0.0, 0.0,
@@ -56,7 +58,7 @@ int main(int argc, char **argv)
 
     if (CONTROLLER == "LQR")
     {
-        controller = std::make_unique<LQRInvertedPendulumController>(node, A, B, Q, R);
+        controller = std::make_unique<LQRInvertedPendulumController>(node, AA, B, Q, R);
     }
     else if (CONTROLLER == "MPC")
     {

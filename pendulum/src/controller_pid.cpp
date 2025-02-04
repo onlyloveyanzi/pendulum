@@ -8,10 +8,10 @@ double PIDInvertedPendulumController::get_output()
     // double F_ff = computeFeedforward(current_state(2), current_state(3));
     // double F_ff = computeFeedforwardNonlinear();
     double F_trans = 0;
-    F_trans = transController->compute(desired_state(0) - current_state(0), dt_);
+    F_trans = transController->compute(current_state(0) - desired_state(0), dt_);
     double F_angle = 0;
-    F_angle = angleController->compute(desired_state(2) - current_state(2), dt_);
-    double total = F_angle + F_trans + F_ff;
+    F_angle = angleController->compute(current_state(2) - desired_state(2), dt_);
+    double total = 0.8*F_angle + 0.2*F_trans + F_ff;
     return total;
 }
 

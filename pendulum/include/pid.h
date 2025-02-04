@@ -13,6 +13,7 @@ public:
         integral += error * dt;
         double derivative = (error - prev_error) / dt;
         prev_error = error;
+        std::cout << error << " " << integral << "" << derivative << std::endl;
         return Kp * error + Ki * integral + Kd * derivative;
     }
 

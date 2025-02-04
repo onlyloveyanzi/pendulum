@@ -1,9 +1,13 @@
 #include "controller_lqr.h"
+#include "controller_base.h"
 
 double LQRInvertedPendulumController::get_output()
 {
     Eigen::Matrix<double, 4, 1> state_error = desired_state - current_state;
-    return K.dot(state_error);
+    return K.dot(state_error) + (M + m)* m*g*l / P * thetaRef;
+
+    double u = -1 * thetaRef + (1 + (M + m)* m*g*l / P) * (current_state[2]+thetaRef) + 2*current_state[3] + (I + m*l*l)/P;
+    return u;
 }
 
 Eigen::Matrix<double, 4, 1> LQRInvertedPendulumController::computeLQR()
